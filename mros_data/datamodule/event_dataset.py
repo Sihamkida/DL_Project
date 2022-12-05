@@ -142,7 +142,7 @@ class SleepEventDataset(RecordDataset, PlottingMixin, Dataset):
         record = self.index_to_record[idx]["record"]
         window_index = self.index_to_record[idx]["idx"]
         window_start = self.index_to_record[idx]["window_start"]
-
+		
         # Load specific channels and location
         signal = load_waveforms(self.metadata[record]["filename"], self.picks, window=window_index)
 

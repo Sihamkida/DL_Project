@@ -37,24 +37,8 @@ def get_record_metadata(filename: str, events: dict, fs: int, window_size: int =
         # N = T // window_size if window_size is not None else 1
         stages = h5["stages"][:]
 
-        # Get indices of windows containing events
-        valid_idx = []
-        # for x in range(0, N):
-        start_stop = np.array([[x * window_size // 2, x * window_size // 2 + window_size] for x in np.arange(N)])
-        for ev_cls in events.keys():
-            for ev in event_data[event]["data"]:
-                midpoint = ev[0] + ev[1] // 2
-                valid_idx.extend(
-                    [int(x) for x in np.argwhere((midpoint >= start_stop[:, 0]) & (midpoint <= start_stop[:, 1]))]
-                )
-        valid_idx = set(valid_idx)
-
         # Set metadata
-        index_to_record = [
-            {"record": filename.stem, "idx": x, "window_start": x * window_size // 2}
-            for x in range(N)
-            if x in valid_idx
-        ]
+        index_to_record = [{"record": filename.stem, "idx": x, "window_start": x * window_size // 2} for x in range(N)]
         # index_to_record = [{"record": filename.stem, "idx": x * window_size} for x in range(N)]
         index_to_record_event = []
         for event_name, event_count in n_events.items():
@@ -78,16 +62,15 @@ def get_record_metadata(filename: str, events: dict, fs: int, window_size: int =
 
 
 def load_waveforms(filename: str, picks: list = None, scaled: bool = True, window: Union[int, slice] = None):
-    print("\n FILENAME: ", filename)
+
     if picks is None:
         picks = ["c3", "c4", "eogl", "eogr", "chin", "legl", "legr", "nasal", "abdo", "thor"]
+
     with File(filename, "r") as h5:
         if scaled:
             waveforms = h5["data"]["scaled"]
-            print("\nWAVEFORM: ", waveform)
         else:
             waveforms = h5["data"]["unscaled"]
-            print("\nWAVEFORM: ", waveform)
         if isinstance(window, int):
             waveforms = waveforms[window]
             channel_idx = {k.lower(): v for k, v in h5["data"]["channel_idx"].attrs.items()}

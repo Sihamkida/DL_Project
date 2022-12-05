@@ -159,7 +159,7 @@ class SleepEventDataset(RecordDataset, PlottingMixin, Dataset):
                     (
                         valid_start,
                         valid_stop,
-                        event["label"] - event["label"],  # This is to ensure that the event label id is 0
+                        event["label"] + 1,
                     )
                 )  # Maybe add the non-event class?
 
@@ -188,9 +188,9 @@ class SleepEventDataset(RecordDataset, PlottingMixin, Dataset):
         return {
             "signal": signal,
             "events": events,
-            "stages": np.array(stages),
+            "stages": stages,
             # "record": self.index_to_record_event[idx]["record"],
-            "record": f"{record}_{window_index:04d}",
+            "record": self.index_to_record[idx]["record"],
             "localizations_target": localizations_target,
             "classifications_target": classifications_target,
         }

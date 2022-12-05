@@ -100,7 +100,7 @@ def get_args_parser():
     parser.add_argument("--coco_panoptic_path", type=str)
     parser.add_argument("--remove_difficult", action="store_true")
 
-    parser.add_argument("--output_dir", default="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DeepLearning_group_2/results", help="path where to save, empty for no saving")
+    parser.add_argument("--output_dir", default="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DL_Project", help="path where to save, empty for no saving")
     parser.add_argument("--device", default="cpu", help="device to use for training / testing")
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--resume", default="", help="resume from checkpoint")
@@ -179,7 +179,8 @@ def main(args):
 
     params = dict(
         # path Siham : "C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DeepLearning_group_2/lm"
-        data_dir="/dtu/blackhole/0c/137804/DeepLearning_group_2",
+        # path 2 = "/dtu/blackhole/0c/137804/DeepLearning_group_2"
+        data_dir="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DL_Project/lm",
         batch_size=args.batch_size,
         n_eval=0,
         n_test=0,
