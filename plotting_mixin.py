@@ -36,6 +36,27 @@ class PlottingMixin:
         # Re-attach transform
         self.transform = transform
 
+    def plot_output(self, output_ev, idx: int, channel_names: List[str] = None, ax: Optional[Axes] = None):
+
+        # Temporarily remove transforms
+        transform = getattr(self, "transform", None)
+        self.transform = None
+
+        sample = self[idx]
+        record = sample["record"]
+        data = sample["signal"]
+        events = output_ev
+        fs = self.fs
+        if channel_names is None:
+            channel_names = self.picks
+
+        fig, ax = plot_data(
+            data, events, fs, channel_names=channel_names, title=f"{record} | No. events: {len(events)}", ax=ax
+        )
+
+        # Re-attach transform
+        self.transform = transform
+    
     def plot_spect(
         self,
         idx: int,

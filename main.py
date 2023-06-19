@@ -22,11 +22,12 @@ from mros_data.datamodule.transforms import STFTTransform
 def get_args_parser():
     parser = argparse.ArgumentParser("Set transformer detector", add_help=False)
     parser.add_argument("--overfit", action="store_true")
+
     parser.add_argument("--lr", default=1e-4, type=float)
     parser.add_argument("--lr_backbone", default=1e-5, type=float)
     parser.add_argument("--batch_size", default=2, type=int)
     parser.add_argument("--weight_decay", default=1e-4, type=float)
-    parser.add_argument("--epochs", default=1, type=int)
+    parser.add_argument("--epochs", default=5, type=int)
     parser.add_argument("--lr_drop", default=200, type=int)
     parser.add_argument("--clip_max_norm", default=0.1, type=float, help="gradient clipping max norm")
 
@@ -54,7 +55,9 @@ def get_args_parser():
 
     # * Transformer
     parser.add_argument("--enc_layers", default=6, type=int, help="Number of encoding layers in the transformer")
+
     parser.add_argument("--dec_layers", default=6, type=int, help="Number of decoding layers in the transformer")
+
     parser.add_argument(
         "--dim_feedforward",
         default=2048,
@@ -100,7 +103,7 @@ def get_args_parser():
     parser.add_argument("--coco_panoptic_path", type=str)
     parser.add_argument("--remove_difficult", action="store_true")
 
-    parser.add_argument("--output_dir", default="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DL_Project", help="path where to save, empty for no saving")
+    parser.add_argument("--output_dir", default="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DL_Project/results_4", help="path where to save, empty for no saving")
     parser.add_argument("--device", default="cpu", help="device to use for training / testing")
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--resume", default="", help="resume from checkpoint")
@@ -149,41 +152,13 @@ def main(args):
     ]
     optimizer = torch.optim.AdamW(param_dicts, lr=args.lr, weight_decay=args.weight_decay)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, args.lr_drop)
-
-    # dataset_train = build_dataset(image_set="train", args=args)
-    # dataset_val = build_dataset(image_set="val", args=args)
-
-    # dataset_train = dm.train
-    # dataset_val = dm.eval
-
-    # if args.distributed:
-    #     sampler_train = DistributedSampler(dataset_train)
-    #     sampler_val = DistributedSampler(dataset_val, shuffle=False)
-    # else:
-    #     sampler_train = torch.utils.data.RandomSampler(dataset_train)
-    #     sampler_val = torch.utils.data.SequentialSampler(dataset_val)
-
-    # batch_sampler_train = torch.utils.data.BatchSampler(sampler_train, args.batch_size, drop_last=True)
-
-    # data_loader_train = DataLoader(
-    #     dataset_train, batch_sampler=batch_sampler_train, collate_fn=utils.collate_fn, num_workers=args.num_workers
-    # )
-    # data_loader_val = DataLoader(
-    #     dataset_val,
-    #     args.batch_size,
-    #     sampler=sampler_val,
-    #     drop_last=False,
-    #     collate_fn=utils.collate_fn,
-    #     num_workers=args.num_workers,
-    # )
-
+    
     params = dict(
-        # path Siham : "C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DeepLearning_group_2/lm"
-        # path 2 = "/dtu/blackhole/0c/137804/DeepLearning_group_2"
+       
         data_dir="C:/Users/45938/Desktop/Autonomous Systems/Third semester/Perception for Autonomous Systems/DL_Project/lm",
         batch_size=args.batch_size,
-        n_eval=0,
-        n_test=0,
+        n_eval=3,
+        n_test=3,
         num_workers=args.num_workers,
         seed=1337,
         events={"lm": "Leg movements"},
@@ -195,10 +170,9 @@ def main(args):
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        n_records=1,
+        n_records=10,
         overfit=args.overfit,
         picks=["legl", "legr"],
-        # transform=MultitaperTransform(128, 0.5, 35.0, tw=8.0, normalize=True),
         transform=STFTTransform(
             fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024, normalize=True
         ),
@@ -208,6 +182,7 @@ def main(args):
     dm.setup()
     data_loader_train = dm.train_dataloader()
     data_loader_val = dm.val_dataloader()
+    print(dm)
 
     if args.dataset_file == "coco_panoptic":
         # We also evaluate AP during panoptic training, on original coco DS
